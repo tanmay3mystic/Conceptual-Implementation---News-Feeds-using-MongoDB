@@ -1,32 +1,25 @@
+  
 const express = require('express')
 const app = express()
 const port = 8080
-
+const {newsArticleModel} = require('./connector')
 const onePageArticleCount = 10
-
-const { newsArticleModel } = require('./connector')
-const { data } = require('./data')
 
 
 // Parse JSON bodies (as sent by API clients)
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+app.get('/newFeeds',async(req,res) => {
+    res.send(await newsArticleModel.find().skip(sanitize(req.query.offset, 0)).limit(sanitize(req.query.limit , 10)));
+});
 
-const middleWare = (req,res,next)=>{
-    let {limit , offset} = req.query ; 
-    req.query.limit =limit === null || limit === undefined || isNaN(Number(limit))?10:limit;
-    req.query.offset = offset === null || offset === undefined || isNaN(Number(offset))?10:offset;
-    
-    next();
+const sanitize = (value, defaultValue) => {
+    if(value === null || value === undefined || isNaN(Number(value))) {
+        return defaultValue;
+    }
+    return Number(value);
 }
-
-app.get("/newFeeds",middleWare , async (req,res)=>{
-    let {limit , offset} = req.query ;
-    res.send(await newsArticleModel.find().skip(offset).limit(limit));
-})
-
-
 
 app.listen(port, () => console.log(`App listening on port ${port}!`))
 
