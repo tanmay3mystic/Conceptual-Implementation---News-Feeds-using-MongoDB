@@ -15,15 +15,15 @@ app.use(express.json());
 
 const middleWare = (req,res,next)=>{
     let {limit , offset} = req.query ; 
-    req.query.limit = Number(limit)?Number(limit):10;
-    req.query.offset = Number(offset)?Number(offset):0;
-    console.log(req.query);
+    req.query.limit =limit === null || limit === undefined || isNaN(Number(limit))?10:limit;
+    req.query.offset = offset === null || offset === undefined || isNaN(Number(offset))?10:offset;
+    
     next();
 }
 
 app.get("/newFeeds", async (req,res)=>{
     let {limit , offset} = req.query ;
-    res.send(await newsArticleModel.find().skip(Number(offset)||0).limit(Number(limit)||10));
+    res.send(await newsArticleModel.find().skip(offset).limit(limit));
 })
 
 
