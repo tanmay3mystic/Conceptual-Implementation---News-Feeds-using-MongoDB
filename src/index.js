@@ -21,7 +21,7 @@ const middleWare = (req,res,next)=>{
     next();
 }
 
-app.get("/newFeeds", async (req,res)=>{
+app.get("/newFeeds",middleWare , async (req,res)=>{
     let {limit , offset} = req.query ;
     res.send(await newsArticleModel.find().skip(offset).limit(limit));
 })
